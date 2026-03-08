@@ -1,0 +1,163 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const banners = [
+  'https://res.cloudinary.com/dc127wztz/image/upload/w_1000,c_scale,q_auto,f_auto/v1770896452/banner1_nw6nok.png',
+  'https://res.cloudinary.com/dc127wztz/image/upload/w_1000,c_scale,q_auto,f_auto/v1770896152/banner_qhjffv.png',
+];
+
+export default function BannerSlider() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0); // -1 for left, 1 for right
+  const [isHovered, setIsHovered] = useState(false);
+
+  const nextSlide = useCallback(() => {
+    setDirection(1);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setDirection(-1);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
+  }, []);
+
+  useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [nextSlide, isHovered]);
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? '20%' : '-20%',
+      opacity: 0,
+      scale: 1.1,
+      filter: 'blur(10px)',
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      scale: 1,
+      filter: 'blur(0px)',
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? '20%' : '-20%',
+      opacity: 0,
+      scale: 0.9,
+      filter: 'blur(10px)',
+    }),
+  };
+
+  return (
+    <section
+      className="relative w-full max-w-[1600px] mx-auto overflow-hidden rounded-[2rem] shadow-2xl bg-gray-100 aspect-[21/9] sm:aspect-[21/7] lg:aspect-[21/6] group"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <AnimatePresence initial={false} custom={direction} mode="popLayout">
+        <motion.div
+          key={currentIndex}
+          custom={direction}
+          variants={variants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{
+            x: { type: 'spring', stiffness: 200, damping: 25 },
+            opacity: { duration: 0.6 },
+            scale: { duration: 0.8 },
+            filter: { duration: 0.6 }
+          }}
+          className="absolute inset-0 w-full h-full"
+        >
+          <motion.div
+            className="relative w-full h-full"
+            animate={{
+              scale: [1, 1.05, 1],
+              x: [0, 10, 0, -10, 0],
+              y: [0, 5, 0, -5, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+          >
+            <Image
+              src={banners[currentIndex]}
+              alt={`Banner ${currentIndex + 1}`}
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+          </motion.div>
+
+          {/* Subtle Overlay for depth */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10 pointer-events-none" />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Arrows */}
+      <div className="absolute inset-0 z-10 flex items-center justify-between px-4 sm:px-8 pointer-events-none">
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+          whileTap={{ scale: 0.9 }}
+          onClick={prevSlide}
+          className="p-3 rounded-full bg-white/70 backdrop-blur-md text-gray-800 shadow-lg pointer-events-auto transition-colors"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.1, backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+          whileTap={{ scale: 0.9 }}
+          onClick={nextSlide}
+          className="p-3 rounded-full bg-white/70 backdrop-blur-md text-gray-800 shadow-lg pointer-events-auto transition-colors"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </motion.button>
+      </div>
+
+      {/* Indicators */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+        {banners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => {
+              setDirection(index > currentIndex ? 1 : -1);
+              setCurrentIndex(index);
+            }}
+            className="group relative p-2"
+          >
+            <div className={`h-1.5 rounded-full transition-all duration-500 ${index === currentIndex ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
+              }`} />
+            {index === currentIndex && (
+              <motion.div
+                layoutId="active-indicator"
+                className="absolute inset-0 rounded-full bg-white/20 blur-sm"
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Autoplay Progress Bar */}
+      <div className="absolute bottom-0 left-0 h-1 bg-white/30 w-full z-20">
+        <motion.div
+          key={currentIndex}
+          initial={{ width: 0 }}
+          animate={{ width: isHovered ? '0%' : '100%' }}
+          transition={{ duration: isHovered ? 0 : 5, ease: 'linear' }}
+          className="h-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+        />
+      </div>
+    </section>
+  );
+}

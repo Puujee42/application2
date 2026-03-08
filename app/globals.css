@@ -1,0 +1,488 @@
+/* Inter font is loaded via next/font in layout.tsx – no duplicate @import to avoid render-blocking request */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Luxury Typography */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+    background: #FFFFFF;
+  }
+}
+
+:root {
+  /* Soyol Brand Colors */
+  --brand-primary: #F57E20;
+  --brand-primary-light: #ff9d4d;
+  --brand-primary-dark: #d46610;
+  --brand-secondary: #1a1a1a;
+  --brand-accent: #F57E20;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(245, 126, 32, 0.1);
+  --glass-shadow: rgba(245, 126, 32, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui;
+  background: #FFFFFF;
+  color: #1a1a1a;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+/* Orange Gradient */
+.gradient-orange {
+  background: linear-gradient(135deg, #FF7900 0%, #ff8c1a 100%);
+}
+
+.gradient-orange-light {
+  background: linear-gradient(135deg, #FF7900 0%, #FFB88C 100%);
+}
+
+.gradient-text-orange {
+  background: linear-gradient(135deg, #FF7900 0%, #ff8c1a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism (Clean White) */
+.glass-white {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid #FF7900;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Orange Glow */
+.glow-orange {
+  box-shadow: 0 4px 20px rgba(255, 121, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.glow-orange:hover {
+  box-shadow: 0 8px 30px rgba(255, 121, 0, 0.4), 0 4px 15px rgba(255, 121, 0, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Orange Search Focus Glow */
+.search-orange-glow:focus {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1), 0 4px 12px rgba(249, 115, 22, 0.15);
+  border-color: rgb(249, 115, 22);
+}
+
+/* Premium Orange Gradient Button */
+.btn-orange-gradient {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-orange-gradient:hover {
+  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Card Clean Shadow */
+.card-clean {
+  background: white;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-clean:hover {
+  border-color: #FF7900;
+  box-shadow: 0 8px 24px rgba(255, 121, 0, 0.15);
+  transform: translateY(-8px);
+}
+
+/* Floating */
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.float-gentle:hover {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Icon Bounce Animation */
+@keyframes iconBounce {
+
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-4px) scale(1.05);
+  }
+}
+
+.icon-bounce:hover {
+  animation: iconBounce 0.6s ease-in-out;
+}
+
+/* Smooth Icon Float */
+@keyframes iconFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.icon-float:hover {
+  animation: iconFloat 1s ease-in-out infinite;
+}
+
+/* Orange Border Accent */
+.border-accent {
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.border-accent:hover {
+  border-bottom-color: #FF7900;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FF7900;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F5F5F5;
+}
+
+/* Hide Scrollbar Utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Shimmer Animation for Search Bar */
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.animate-shimmer-border {
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Disable double-tap to zoom on mobile (touch devices) */
+@media (max-width: 768px) {
+  html {
+    touch-action: manipulation;
+    -ms-touch-action: manipulation;
+  }
+
+  * {
+    touch-action: manipulation;
+  }
+}
+
+/* Mobile bottom nav safe area (notched devices) */
+.safe-area-pb {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}
+
+/* Mobile Responsive Utilities */
+@media (max-width: 640px) {
+
+  /* Prevent horizontal scroll on mobile */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Better touch targets for mobile */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Optimize text readability on mobile */
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  /* Better spacing on mobile */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Safe area for notched devices (iPhone X, etc.) */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 768px) {
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Smooth drawer animation performance */
+.drawer-content {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Better tap highlight */
+* {
+  -webkit-tap-highlight-color: rgba(255, 121, 0, 0.1);
+}
+
+/* Luxury Glassmorphism */
+.luxury-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.luxury-glass-light {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* Premium Hover Effects */
+.luxury-hover {
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.luxury-hover:hover {
+  transform: translateY(-1px);
+}
+
+/* Smooth Underline Animation */
+.luxury-link {
+  position: relative;
+}
+
+.luxury-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.luxury-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Mobile Navigation Drawer Animations */
+@media (max-width: 1024px) {
+  .mobile-drawer {
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  /* Prevent body scroll when drawer is open */
+  body.drawer-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+}
+
+/* Responsive Grid Utilities */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .responsive-grid-2 {
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .responsive-grid-2 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .responsive-grid-2 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 768px) {
+
+  button,
+  a.button,
+  .button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Slightly larger touch targets for icon buttons */
+  button[aria-label],
+  button.icon-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Optimize images for mobile */
+@media (max-width: 640px) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Smooth scrolling on mobile */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Better focus states for accessibility */
+@media (max-width: 768px) {
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 2px solid #FF7900;
+    outline-offset: 2px;
+  }
+}
+
+/* Prevent layout shifts on mobile */
+@media (max-width: 640px) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Better mobile modal/drawer backdrop */
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Optimize transforms for mobile performance */
+.mobile-slide {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Search dropdown entrance */
+@keyframes searchDropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.search-dropdown-enter {
+  animation: searchDropdownFade 0.2s ease-out;
+}

@@ -1,0 +1,87 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getCollection } from '@/lib/mongodb';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+export async function GET(request: NextRequest) {
+  console.log('[Products API] GET request received:', request.nextUrl.search);
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const category = searchParams.get('category');
+    const q = searchParams.get('q')?.trim();
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+
+    const products = await getCollection('products');
+    const filter: Record<string, any> = {};
+
+    if (category && category !== 'all') {
+      filter.category = category;
+    }
+
+    if (q) {
+      filter.$text = { $search: q };
+    }
+
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) (filter.price as any).$gte = parseFloat(minPrice);
+      if (maxPrice) (filter.price as any).$lte = parseFloat(maxPrice);
+    }
+
+    // Dynamic Attribute Filtering
+    searchParams.forEach((value, key) => {
+      if (key.startsWith('attr_') && value) {
+        const attributeId = key.replace('attr_', '');
+        filter[`attributes.${attributeId}`] = value;
+      }
+    });
+
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50);
+    const cursor = searchParams.get('cursor');
+
+    if (cursor) {
+      // For cursor-based pagination with descending createdAt, we need a stable sort
+      // If we use _id as cursor, we assume sorting by _id (which is roughly by time)
+      const { ObjectId } = await import('mongodb');
+      filter._id = { $lt: new ObjectId(cursor) };
+    }
+
+    const cursorQuery = products.find(filter).sort({ _id: -1 });
+
+    if (q) {
+      // Add text score if searching
+      (cursorQuery as any).project({ score: { $meta: 'textScore' } });
+      (cursorQuery as any).sort({ score: { $meta: 'textScore' }, _id: -1 });
+    }
+
+    const results = await cursorQuery.limit(limit + 1).toArray();
+
+    const hasMore = results.length > limit;
+    const items = hasMore ? results.slice(0, limit) : results;
+    const nextCursor = hasMore ? items[items.length - 1]._id.toString() : null;
+
+    const mappedResults = items.map((product) => ({
+      ...product,
+      id: product._id.toString(),
+    }));
+
+    return NextResponse.json(
+      { products: mappedResults, nextCursor, hasMore },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
+        },
+      }
+    );
+  } catch (error) {
+    const err = error instanceof Error ? error : new Error(String(error));
+    console.error('[Products API] Error:', err.message);
+
+    return NextResponse.json(
+      { products: [], nextCursor: null, hasMore: false },
+      { status: 200 }
+    );
+  }
+}

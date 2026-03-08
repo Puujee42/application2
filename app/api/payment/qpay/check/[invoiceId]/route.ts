@@ -1,0 +1,58 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getCollection } from '@/lib/mongodb';
+import { checkPayment } from '@/lib/qpay';
+import { ObjectId } from 'mongodb';
+
+export async function GET(
+    req: NextRequest,
+    { params }: { params: Promise<{ invoiceId: string }> }
+) {
+    try {
+        const { invoiceId } = await params;
+
+        if (!invoiceId) {
+            return NextResponse.json({ error: 'Missing invoiceId' }, { status: 400 });
+        }
+
+        // 1. Check QPay Status
+        const paymentStatus = await checkPayment(invoiceId);
+
+        if (paymentStatus.paid) {
+            // 2. Update Order Status
+            const ordersCollection = await getCollection('orders');
+            const order = await ordersCollection.findOne({ qpayInvoiceId: invoiceId });
+
+            if (order && order.status === 'pending') {
+                await ordersCollection.updateOne(
+                    { _id: order._id },
+                    {
+                        $set: {
+                            status: 'confirmed',
+                            paidAt: paymentStatus.paidAt,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                // Notify Customer (Non-blocking)
+                try {
+                    const notificationsCollection = await getCollection('notifications');
+                    await notificationsCollection.insertOne({
+                        userId: order.userId,
+                        title: '✅ Төлбөр баталгаажлаа',
+                        message: `Таны #${order._id.toString().slice(-6)} захиалгын төлбөр амжилттай хийгдлээ.`,
+                        type: 'order',
+                        isRead: false,
+                        link: `/orders/${order._id}`,
+                        createdAt: new Date()
+                    });
+                } catch (e) { console.error('Notify error', e); }
+            }
+        }
+
+        return NextResponse.json(paymentStatus);
+    } catch (error: any) {
+        console.error('[QPay Check API] Error:', error);
+        return NextResponse.json({ error: 'Status check failed' }, { status: 500 });
+    }
+}

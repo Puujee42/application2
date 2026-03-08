@@ -1,0 +1,168 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { ChevronLeft, Search, ChevronDown, ChevronUp, PhoneCall, MessageCircle, Mail } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const FAQS = [
+    {
+        id: 1,
+        question: 'Захиалга хэрхэн хийх вэ?',
+        answer: 'Та хүссэн бараагаа сонгон сагсанд нэмж, "Худалдан авах" товчийг даран хүргэлтийн мэдээллээ оруулснаар захиалга баталгаажна.'
+    },
+    {
+        id: 2,
+        question: 'Хүргэлт хэдэн хоногт ирдэг вэ?',
+        answer: 'Улаанбаатар хот дотор 24-48 цагийн дотор, орон нутагт 3-5 хоногийн дотор хүргэгдэнэ.'
+    },
+    {
+        id: 3,
+        question: 'Төлбөрийн аргууд юу юу байдаг вэ?',
+        answer: 'Бид QPay, Банкны карт, шилжүүлэг болон бэлнээр (хүргэлт дээр) төлөх боломжуудыг санал болгож байна.'
+    },
+    {
+        id: 4,
+        question: 'Буцаалт хэрхэн хийх вэ?',
+        answer: 'Барааг хүлээн авснаас хойш 48 цагийн дотор сав баглаа боодлыг гэмтээгээгүй нөхцөлд буцаах боломжтой.'
+    },
+    {
+        id: 5,
+        question: 'Холбоо барих мэдээлэл',
+        answer: 'Та манай хэрэглэгчийн үйлчилгээний төвтэй 77-181818 дугаараар эсвэл info@soyol.mn хаягаар холбогдоорой.'
+    }
+];
+
+export default function HelpPage() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [openId, setOpenId] = useState<number | null>(null);
+
+    const filteredFaqs = FAQS.filter(f =>
+        f.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        f.answer.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return (
+        <div className="min-h-screen bg-[#F5F5F5] font-sans pb-10">
+            {/* Header */}
+            <div className="bg-white h-[56px] flex items-center px-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] sticky top-0 z-50">
+                <Link href="/profile" className="p-2 -ml-2 text-[#1A1A1A]">
+                    <ChevronLeft className="w-6 h-6" strokeWidth={2} />
+                </Link>
+                <h1 className="flex-1 text-center text-[16px] font-bold text-[#1A1A1A] pr-8">
+                    Тусламж & Дэмжлэг
+                </h1>
+            </div>
+
+            <div className="p-4 space-y-6">
+
+                {/* Search */}
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Search className="h-5 w-5 text-[#999999]" strokeWidth={2} />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Асуулт хайх..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="block w-full pl-11 pr-4 py-3.5 bg-white border border-transparent rounded-[14px] leading-5 text-[#1A1A1A] placeholder-[#999999] focus:outline-none focus:ring-2 focus:ring-[#FF6B00] focus:border-transparent shadow-[0_2px_8px_rgba(0,0,0,0.06)] font-medium text-[15px]"
+                    />
+                </div>
+
+                {/* FAQ Section */}
+                <div>
+                    <h2 className="text-[11px] font-bold text-[#999999] uppercase tracking-wider ml-4 mb-2">Түгээмэл асуултууд</h2>
+                    <div className="bg-white rounded-[14px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+                        {filteredFaqs.length > 0 ? (
+                            filteredFaqs.map((faq, index) => {
+                                const isOpen = openId === faq.id;
+                                return (
+                                    <div key={faq.id} className={`${index !== filteredFaqs.length - 1 ? 'border-b border-[#F5F5F5]' : ''}`}>
+                                        <button
+                                            onClick={() => setOpenId(isOpen ? null : faq.id)}
+                                            className="w-full flex items-center justify-between p-4 text-left active:bg-gray-50 transition-colors"
+                                        >
+                                            <span className="text-[15px] font-bold text-[#1A1A1A] pr-4 leading-tight">{faq.question}</span>
+                                            {isOpen ? (
+                                                <ChevronUp className="w-5 h-5 text-[#FF6B00] shrink-0" strokeWidth={2} />
+                                            ) : (
+                                                <ChevronDown className="w-5 h-5 text-[#999999] shrink-0" strokeWidth={2} />
+                                            )}
+                                        </button>
+                                        <AnimatePresence>
+                                            {isOpen && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.2 }}
+                                                    className="overflow-hidden bg-[#FAFAFA]"
+                                                >
+                                                    <p className="p-4 pt-0 text-[14px] text-[#666666] leading-relaxed">
+                                                        {faq.answer}
+                                                    </p>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="p-6 text-center text-[#999999] text-[14px]">
+                                Илэрц олдсонгүй
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Contact Section */}
+                <div>
+                    <h2 className="text-[11px] font-bold text-[#999999] uppercase tracking-wider ml-4 mb-2">Холбоо барих</h2>
+                    <div className="bg-white rounded-[14px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col gap-[1px] bg-[#F5F5F5]">
+
+                        <a href="tel:77181818" className="flex items-center justify-between p-4 bg-white active:bg-gray-50 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
+                                    <PhoneCall className="w-5 h-5 text-[#FF6B00]" strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <div className="text-[13px] text-[#999999] font-medium mb-0.5">Утас</div>
+                                    <div className="text-[16px] font-bold text-[#1A1A1A]">77-181818</div>
+                                </div>
+                            </div>
+                            <span className="text-[13px] font-bold text-[#FF6B00] px-3 py-1.5 bg-orange-50 rounded-full">Залгах</span>
+                        </a>
+
+                        <button className="flex items-center justify-between p-4 bg-white active:bg-gray-50 transition-colors w-full text-left">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center">
+                                    <MessageCircle className="w-5 h-5 text-blue-500" strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <div className="text-[16px] font-bold text-[#1A1A1A]">Чат дэмжлэг</div>
+                                    <div className="text-[12px] text-[#999999] font-medium mt-0.5">Онлайн: 09:00 - 22:00</div>
+                                </div>
+                            </div>
+                            <span className="text-[13px] font-bold text-[#FF6B00] px-3 py-1.5 bg-orange-50 rounded-full">Бичих</span>
+                        </button>
+
+                        <a href="mailto:info@soyol.mn" className="flex items-center justify-between p-4 bg-white active:bg-gray-50 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center">
+                                    <Mail className="w-5 h-5 text-gray-500" strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <div className="text-[13px] text-[#999999] font-medium mb-0.5">И-мэйл</div>
+                                    <div className="text-[15px] font-bold text-[#1A1A1A]">info@soyol.mn</div>
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    );
+}
