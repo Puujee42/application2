@@ -118,7 +118,7 @@ export default function MyOrdersPage() {
                     <div className="flex justify-between items-center mb-4 pb-4 border-b border-slate-50">
                       <div className="flex flex-col">
                         <span className="text-[14px] font-black text-slate-900 group-hover:text-[#FF5000] transition-colors">#{order._id.slice(-6).toUpperCase()}</span>
-                        <span className="text-[11px] font-bold text-slate-400">{new Date(order.createdAt).toLocaleDateString('.')}</span>
+                        <span className="text-[11px] font-bold text-slate-400">{new Date(order.createdAt).toLocaleDateString('mn-MN')}</span>
                       </div>
                       <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full ${status.bg} ${status.color}`}>
                         <Icon className="w-3.5 h-3.5" strokeWidth={2.5} />
