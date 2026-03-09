@@ -137,8 +137,11 @@ export default function HomePage() {
                 </div>
               </motion.button>
 
-              {['Шинэ', 'Бэлэн'].map((section) => {
-                const Icon = section === 'Шинэ' ? Sparkles : section === 'Бэлэн' ? Package : section === 'Захиалга' ? Clock : Tag;
+              {['Шинэ', 'Бэлэн', 'Захиалга', 'Хямдрал'].map((section) => {
+                const Icon = section === 'Шинэ' ? Sparkles
+                  : section === 'Бэлэн' ? Package
+                    : section === 'Захиалга' ? Clock
+                      : Tag;
                 const isActive = activeFilter === section;
 
                 return (
