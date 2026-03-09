@@ -9,6 +9,7 @@ import { useCartStore } from '@/store/cartStore';
 import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import toast from 'react-hot-toast';
+import ProductBadge from '@/components/ProductBadge';
 
 interface Product {
     id: string;
@@ -39,7 +40,7 @@ export default function SpecialProductsCarousel({ products }: SpecialProductsCar
     const [scrollLeftPos, setScrollLeftPos] = useState(0);
     const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
 
-    const specialProducts = products.filter((p) => p.featured);
+    const specialProducts = products.filter((p) => p.featured || (p.rating && p.rating >= 4.5));
     const displayProducts = specialProducts.length > 0 ? specialProducts : products.slice(0, 12);
 
     const updateScrollButtons = useCallback(() => {
@@ -210,8 +211,15 @@ export default function SpecialProductsCarousel({ products }: SpecialProductsCar
                                         fill
                                         draggable={false}
                                         className="object-contain p-6 transition-transform duration-700 group-hover:scale-110"
-                                        sizes="(max-width: 768px) 100vw, 50vw"
                                         priority
+                                    />
+
+                                    {/* Product Badge */}
+                                    <ProductBadge
+                                        rating={product.rating}
+                                        sections={[]}
+                                        isFeatured={product.featured}
+                                        className="static absolute top-3 right-3 scale-[0.8] origin-top-right !shadow-md"
                                     />
 
                                     {/* Dark gradient overlay on hover */}
