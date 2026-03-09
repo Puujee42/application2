@@ -17,28 +17,55 @@ import MobileHero from '@/components/MobileHero';
 import MobileProductGrid from '@/components/MobileProductGrid';
 import InfiniteScrollTrigger from '@/components/InfiniteScrollTrigger';
 
-type FilterType = 'all' | 'Бэлэн' | 'Захиалга';
+type FilterType = 'all' | 'Бэлэн' | 'Захиалга' | 'Шинэ' | 'Хямдрал' | string;
 type SortType = 'newest' | 'price-low' | 'price-high' | 'name-az';
 
 export default function HomePage() {
   const { currency, convertPrice } = useLanguage();
   const { t } = useTranslation();
-  const { products: allProducts, isLoading: loading, isLoadingMore, isReachingEnd, size, setSize, error } = useProducts();
 
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const { products: allProducts, isLoading: loading, isLoadingMore, isReachingEnd, size, setSize, error } = useProducts();
+
   const [sortBy, setSortBy] = useState<SortType>('name-az');
   const [minPrice, setMinPrice] = useState<string>('');
   const [maxPrice, setMaxPrice] = useState<string>('');
   const [showPriceFilter, setShowPriceFilter] = useState(false);
 
-  // Separate by stock status: "in-stock" = READY (Бэлэн), "pre-order" = Захиалгаар
-  const readyProducts = allProducts.filter((p: Product) => (p.stockStatus || 'in-stock') === 'in-stock');
-  const preOrderProducts = allProducts.filter((p: Product) => (p.stockStatus || '') === 'pre-order');
+  // Apply active tab filter
+  let filteredProducts: Product[];
 
-  // Apply active tab filter (Sections based)
-  let filteredProducts = activeFilter === 'all'
-    ? [...allProducts]
-    : allProducts.filter((p: Product) => p.sections?.includes(activeFilter));
+  if (activeFilter === 'all') {
+    // Бүгд — бүх бараа
+    filteredProducts = [...allProducts];
+  } else if (activeFilter === 'Бэлэн') {
+    // Бэлэн бараа — stockStatus === 'in-stock' (эсвэл тодорхойгүй бол default нь in-stock)
+    filteredProducts = allProducts.filter((p: Product) =>
+      !p.stockStatus || p.stockStatus === 'in-stock'
+    );
+  } else if (activeFilter === 'Захиалга') {
+    // Захиалгаар — stockStatus === 'pre-order'
+    filteredProducts = allProducts.filter((p: Product) =>
+      p.stockStatus === 'pre-order'
+    );
+  } else if (activeFilter === 'Шинэ') {
+    // Шинэ бараа — sections-д 'Шинэ' агуулсан эсвэл сүүлийн 30 хоногт нэмэгдсэн
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    filteredProducts = allProducts.filter((p: Product) =>
+      p.sections?.includes('Шинэ') ||
+      (p.createdAt && new Date(p.createdAt) > thirtyDaysAgo)
+    );
+  } else if (activeFilter === 'Хямдрал') {
+    // Хямдрал — originalPrice байгаа болон price < originalPrice
+    filteredProducts = allProducts.filter((p: Product) =>
+      p.originalPrice && p.originalPrice > p.price
+    );
+  } else {
+    // Бусад section-based filter (Онцлох гэх мэт)
+    filteredProducts = allProducts.filter((p: Product) =>
+      p.sections?.includes(activeFilter)
+    );
+  }
 
   // Apply price filter
   const minPriceNum = minPrice ? parseFloat(minPrice) : 0;
@@ -137,26 +164,37 @@ export default function HomePage() {
                 </div>
               </motion.button>
 
-              {['Бэлэн', 'Захиалга'].map((section) => {
-                const Icon = section === 'Бэлэн' ? Package
-                  : section === 'Захиалга' ? Clock
-                    : Tag;
-                const isActive = activeFilter === section;
+              {([
+                { key: 'Бэлэн', icon: Package },
+                { key: 'Захиалга', icon: Clock },
+              ] as const).map(({ key, icon: Icon }) => {
+                const isActive = activeFilter === key;
+
+                // Тоо тооцох
+                const count = key === 'Бэлэн'
+                  ? allProducts.filter((p: Product) => !p.stockStatus || p.stockStatus === 'in-stock').length
+                  : allProducts.filter((p: Product) => p.stockStatus === 'pre-order').length;
 
                 return (
                   <motion.button
-                    key={section}
+                    key={key}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveFilter(section as any)}
+                    onClick={() => setActiveFilter(key)}
                     className={`px-4 py-2 lg:px-5 lg:py-2.5 rounded-2xl font-bold text-xs lg:text-sm transition-all duration-300 whitespace-nowrap ${isActive
-                      ? 'bg-[#FF5000] text-white shadow-lg shadow-orange-500/30'
-                      : 'bg-white/50 text-gray-600 hover:bg-white border border-gray-100'
+                        ? 'bg-[#FF5000] text-white shadow-lg shadow-orange-500/30'
+                        : 'bg-white/50 text-gray-600 hover:bg-white border border-gray-100'
                       }`}
                   >
                     <div className="flex items-center gap-1.5 lg:gap-2">
                       <Icon className="w-3 h-3 lg:w-3.5 lg:h-3.5" strokeWidth={1.2} />
-                      <span>{section}</span>
+                      <span>{key}</span>
+                      {count > 0 && (
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'
+                          }`}>
+                          {count}
+                        </span>
+                      )}
                     </div>
                   </motion.button>
                 );
@@ -283,13 +321,11 @@ export default function HomePage() {
               </div>
 
               {/* Infinite Scroll Trigger */}
-              {activeFilter === 'all' && (
-                <InfiniteScrollTrigger
-                  onLoadMore={() => setSize(size + 1)}
-                  hasMore={!isReachingEnd}
-                  isLoading={!!isLoadingMore}
-                />
-              )}
+              <InfiniteScrollTrigger
+                onLoadMore={() => setSize(size + 1)}
+                hasMore={!isReachingEnd}
+                isLoading={!!isLoadingMore}
+              />
             </>
           )}
         </div>

@@ -115,6 +115,7 @@ export default function DiscoveryProductCard({ product, index = 0, showTrendingB
           <ProductBadge
             rating={product.rating}
             sections={product.sections}
+            isFeatured={product.featured}
             showTrendingBadge={showTrendingBadge}
             className="static shadow-sm scale-95 origin-top-left"
           />

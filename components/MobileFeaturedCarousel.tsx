@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import toast from 'react-hot-toast';
 import { useEffect, useState, useRef, useMemo } from 'react';
+import ProductBadge from '@/components/ProductBadge';
 interface Product {
     id: string;
     _id?: string;
@@ -20,6 +21,7 @@ interface Product {
     stockStatus?: string;
     inventory?: number;
     featured?: boolean;
+    sections?: string[];
 }
 
 interface MobileFeaturedCarouselProps {
@@ -33,7 +35,7 @@ export default function MobileFeaturedCarousel({ products }: MobileFeaturedCarou
 
     // Prepare loop items with memoization to prevent re-renders
     const loopItems = useMemo(() => {
-        const featured = products.filter((p) => p.featured);
+        const featured = products.filter((p) => p.featured || p.sections?.includes('Онцгой') || p.sections?.includes('Онцлох'));
         if (featured.length === 0) return [];
 
         // Ensure we have enough items to fill a reasonable width before duplication
@@ -203,10 +205,10 @@ export default function MobileFeaturedCarousel({ products }: MobileFeaturedCarou
                                         draggable={false}
                                     />
 
-                                    {/* 🔥 TOP Badge - Top Right */}
-                                    <div className="absolute top-3 right-3 z-10 bg-white/80 backdrop-blur-md text-slate-900 text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1 border border-white/20">
-                                        🔥 TOP
-                                    </div>
+                                    <ProductBadge
+                                        isFeatured={product.featured || product.sections?.includes('Онцгой') || product.sections?.includes('Онцлох')}
+                                        className="top-3 right-3 scale-90"
+                                    />
 
                                     {/* Stock Badge - Left */}
                                     {product.inventory !== undefined && product.inventory < 10 && (
@@ -226,16 +228,6 @@ export default function MobileFeaturedCarousel({ products }: MobileFeaturedCarou
                                         </h3>
                                     </Link>
 
-                                    {/* Rating */}
-                                    <div className="flex items-center gap-1">
-                                        {[...Array(5)].map((_, idx) => (
-                                            <Star
-                                                key={idx}
-                                                className={`w-2.5 h-2.5 ${idx < Math.round(product.rating ?? 4.5) ? 'text-amber-400 fill-amber-400' : 'text-slate-200 fill-slate-200'}`}
-                                            />
-                                        ))}
-                                        <span className="text-[10px] font-bold text-slate-400 ml-0.5">{product.rating ?? 4.5}</span>
-                                    </div>
                                 </div>
 
                                 <div className="flex items-end justify-between pt-2">

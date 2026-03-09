@@ -37,12 +37,10 @@ export type ProductDetailData = {
   paymentMethods?: string;
   createdAt?: string;
   updatedAt?: string;
-  rating?: number;
   wholesale?: boolean;
   sections?: string[];
   featured?: boolean;
   relatedProducts?: Product[];
-  reviewCount?: number;
   attributes?: Record<string, any>;
 };
 
@@ -228,7 +226,6 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
 
-  const rating = product.rating ?? 4.5;
   const router = useRouter();
   const { addItem, toggleAllSelection } = useCartStore();
   const { t } = useTranslation();
@@ -275,7 +272,6 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
       addItem({
         ...product,
         image: product.image || '',
-        rating: product.rating ?? 0,
         stockStatus: product.stockStatus as any,
         description: product.description || undefined,
       });
@@ -295,7 +291,7 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
 
   const handleBuyNow = () => {
     toggleAllSelection(false);
-    addItem({ ...product, image: product.image || '', rating: product.rating ?? 0, stockStatus: product.stockStatus as any, description: product.description || undefined });
+    addItem({ ...product, image: product.image || '', stockStatus: product.stockStatus as any, description: product.description || undefined });
     router.push('/checkout');
   };
 
@@ -535,11 +531,6 @@ export default function ProductDetailClient({ product }: { product: ProductDetai
                     <BadgeCheck className="w-3.5 h-3.5" />
                     {product.brand || product.category}
                   </Link>
-                  <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-full border border-amber-100">
-                    <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                    <span className="font-bold text-slate-900 text-sm">{rating}</span>
-                    {product.reviewCount ? <span className="text-slate-400 text-xs">({product.reviewCount})</span> : null}
-                  </div>
                 </div>
 
                 {/* Title */}
@@ -791,7 +782,6 @@ function ProductInfoTabs({ product }: { product: any }) {
   const tabs = [
     { id: 'description', label: 'Тайлбар' },
     { id: 'specs', label: 'Үзүүлэлт' },
-    { id: 'reviews', label: `Үнэлгээ (${product.reviewCount || 0})` },
   ];
   const [activeTab, setActiveTab] = useState('description');
 

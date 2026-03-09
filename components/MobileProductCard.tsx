@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, ShoppingCart } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { type Product } from '@/models/Product';
 import { useLanguage } from '@/context/LanguageContext';
 import { formatCurrency } from '@/lib/utils';
@@ -44,8 +44,8 @@ export default function MobileProductCard({ product }: MobileProductCardProps) {
                     {/* Premium Status & Discount Badges */}
                     <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 items-start">
                         <ProductBadge
-                            rating={product.rating}
                             sections={product.sections}
+                            isFeatured={product.featured}
                             className="static scale-90 origin-top-left"
                         />
                         {product.discountPercent && product.discountPercent > 0 && (
@@ -96,7 +96,6 @@ export default function MobileProductCard({ product }: MobileProductCardProps) {
                                         name: product.name,
                                         price: product.price,
                                         image: product.image || '',
-                                        rating: product.rating ?? 0,
                                         stockStatus: (product.stockStatus as any) || 'in-stock',
                                         category: product.category || '',
                                         description: product.description || undefined,
@@ -118,9 +117,3 @@ export default function MobileProductCard({ product }: MobileProductCardProps) {
     );
 }
 
-// Minimal Star Icon
-const StarIcon = ({ className }: { className?: string }) => (
-    <svg className={className} viewBox="0 0 20 20">
-        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
-    </svg>
-);

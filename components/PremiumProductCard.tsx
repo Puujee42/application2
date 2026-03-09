@@ -49,7 +49,6 @@ export default function PremiumProductCard({ product, isFeatured = false }: { pr
     const { formatPrice: formatPriceWithCurrency } = useLanguage();
     const { t } = useTranslation();
 
-    const rating = product.rating || 4.9;
     const isWishlisted = isInWishlist(product.id);
 
     return (
@@ -69,9 +68,8 @@ export default function PremiumProductCard({ product, isFeatured = false }: { pr
                         {/* Badges */}
                         <div className="absolute top-3 left-3 z-10 flex flex-col gap-2 items-start">
                             <ProductBadge
-                                rating={product.rating}
                                 sections={product.sections}
-                                isFeatured={isFeatured}
+                                isFeatured={product.featured}
                                 className="static"
                             />
                             {product.discountPercent && product.discountPercent > 0 && (
@@ -81,7 +79,7 @@ export default function PremiumProductCard({ product, isFeatured = false }: { pr
                                     </span>
                                 </div>
                             )}
-                            {!isFeatured && (!product.rating || product.rating < 4.5) && (!product.sections || !product.sections.includes('Шинэ')) && (
+                            {(!product.sections || !product.sections.includes('Шинэ')) && (
                                 <div className="px-2.5 py-1 bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 rounded-full flex items-center shadow-sm">
                                     <span className="text-[9px] sm:text-[10px] font-extrabold tracking-widest text-white uppercase">
                                         {product.category}
@@ -90,13 +88,6 @@ export default function PremiumProductCard({ product, isFeatured = false }: { pr
                             )}
                         </div>
 
-                        {/* Rating */}
-                        <div className="absolute top-3 right-3 z-10">
-                            <div className="px-2 py-1 bg-white/90 backdrop-blur-md rounded-full shadow-sm flex items-center gap-1 border border-gray-100">
-                                <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                                <span className="text-[10px] font-bold text-gray-800">{rating}</span>
-                            </div>
-                        </div>
 
                         {/* Wishlist Button */}
                         <motion.button
@@ -112,7 +103,7 @@ export default function PremiumProductCard({ product, isFeatured = false }: { pr
                                     toast.success(t('product', 'addedToWishlist'));
                                 }
                             }}
-                            className="absolute top-12 right-3 z-20 p-2 rounded-full bg-white shadow-md hover:scale-110 transition-transform"
+                            className="absolute top-3 right-3 z-20 p-2 rounded-full bg-white shadow-md hover:scale-110 transition-transform"
                         >
                             <Heart
                                 className={`w-4 h-4 transition-colors ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-400'}`}

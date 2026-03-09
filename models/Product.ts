@@ -10,7 +10,6 @@ export interface Product {
   discountPercent?: number; // 0-100
   discount?: number;
   description?: string;
-  rating?: number;
   category: string;
   featured?: boolean;
   wholesale?: boolean;

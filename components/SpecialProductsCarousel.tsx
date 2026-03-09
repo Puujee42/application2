@@ -10,6 +10,8 @@ import { useLanguage } from '@/context/LanguageContext';
 import { useTranslation } from '@/hooks/useTranslation';
 import toast from 'react-hot-toast';
 
+import ProductBadge from '@/components/ProductBadge';
+
 interface Product {
     id: string;
     _id?: string;
@@ -21,6 +23,7 @@ interface Product {
     stockStatus?: string;
     inventory?: number;
     featured?: boolean;
+    sections?: string[];
 }
 
 interface SpecialProductsCarouselProps {
@@ -39,7 +42,7 @@ export default function SpecialProductsCarousel({ products }: SpecialProductsCar
     const [scrollLeftPos, setScrollLeftPos] = useState(0);
     const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
 
-    const specialProducts = products.filter((p) => p.featured);
+    const specialProducts = products.filter((p) => p.featured || p.sections?.includes('Онцгой') || p.sections?.includes('Онцлох'));
     const displayProducts = specialProducts.length > 0 ? specialProducts : products.slice(0, 12);
 
     const updateScrollButtons = useCallback(() => {
@@ -227,6 +230,11 @@ export default function SpecialProductsCarousel({ products }: SpecialProductsCar
                                         </div>
                                     )}
 
+                                    <ProductBadge
+                                        isFeatured={product.featured || product.sections?.includes('Онцгой') || product.sections?.includes('Онцлох')}
+                                        className="top-4 right-4"
+                                    />
+
                                     {/* Quick Add Button - Bigger & Bolder */}
                                     <button
                                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAddToCart(product); }}
@@ -252,18 +260,7 @@ export default function SpecialProductsCarousel({ products }: SpecialProductsCar
                                     </h3>
                                 </Link>
 
-                                {/* Rating */}
-                                <div className="flex items-center gap-1.5">
-                                    {[...Array(5)].map((_, idx) => (
-                                        <Star
-                                            key={idx}
-                                            className={`w-4 h-4 ${idx < Math.round(product.rating ?? 4.5) ? 'text-amber-400 fill-amber-400' : 'text-slate-200 fill-slate-200'}`}
-                                        />
-                                    ))}
-                                    <span className="text-sm font-semibold text-slate-500 ml-1">{product.rating ?? 4.5}</span>
-                                </div>
-
-                                {/* Price & Category */}
+                                {/* Category */}
                                 <div className="flex items-end justify-between pt-1">
                                     <span className="text-xl lg:text-2xl font-black text-slate-900">
                                         {formatPrice(product.price)}
