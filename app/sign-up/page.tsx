@@ -22,12 +22,12 @@ export default function SignUpPage() {
         e.preventDefault();
 
         if (!formData.name || !formData.phone || !formData.age || !formData.password) {
-            toast.error('All fields are required');
+            toast.error('Бүх талбарыг бөглөнө үү');
             return;
         }
 
         if (formData.phone.length < 8) {
-            toast.error('Invalid phone number');
+            toast.error('Утасны дугаар буруу байна');
             return;
         }
 
@@ -42,10 +42,10 @@ export default function SignUpPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                throw new Error(data.error || 'Failed to create account');
+                throw new Error(data.error || 'Бүртгэл үүсгэхэд алдаа гарлаа');
             }
 
-            toast.success('Account created successfully!');
+            toast.success('Бүртгэл амжилттай үүслээ');
 
             // Auto-login if user data returned
             if (data.user) {
