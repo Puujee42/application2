@@ -383,22 +383,40 @@ export default function AdminOrdersPage() {
                                                     <td className="p-4 text-right">
                                                         <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
                                                             {order.status === 'pending' && (
-                                                                <button
-                                                                    onClick={() => handleStatusQuickChange(order._id, 'confirmed')}
-                                                                    disabled={quickUpdating === order._id}
-                                                                    className="px-3 py-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-blue-500/20 disabled:opacity-50"
-                                                                >
-                                                                    {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Батлах'}
-                                                                </button>
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleStatusQuickChange(order._id, 'confirmed')}
+                                                                        disabled={quickUpdating === order._id}
+                                                                        className="px-3 py-1.5 bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-blue-500/20 disabled:opacity-50"
+                                                                    >
+                                                                        {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Батлах'}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleStatusQuickChange(order._id, 'cancelled')}
+                                                                        disabled={quickUpdating === order._id}
+                                                                        className="px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-red-500/20 disabled:opacity-50"
+                                                                    >
+                                                                        {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Цуцлах'}
+                                                                    </button>
+                                                                </>
                                                             )}
                                                             {order.status === 'confirmed' && (
-                                                                <button
-                                                                    onClick={() => handleStatusQuickChange(order._id, 'delivered')}
-                                                                    disabled={quickUpdating === order._id}
-                                                                    className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-emerald-500/20 disabled:opacity-50"
-                                                                >
-                                                                    {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Хүргэх'}
-                                                                </button>
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => handleStatusQuickChange(order._id, 'delivered')}
+                                                                        disabled={quickUpdating === order._id}
+                                                                        className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-emerald-500/20 disabled:opacity-50"
+                                                                    >
+                                                                        {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Хүргэх'}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleStatusQuickChange(order._id, 'cancelled')}
+                                                                        disabled={quickUpdating === order._id}
+                                                                        className="px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white text-xs font-bold rounded-lg transition-colors border border-red-500/20 disabled:opacity-50"
+                                                                    >
+                                                                        {quickUpdating === order._id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Цуцлах'}
+                                                                    </button>
+                                                                </>
                                                             )}
                                                             {order.status === 'delivered' && <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-500/20 text-emerald-400 border border-emerald-500/20">Хүргэгдсэн</span>}
                                                             {order.status === 'cancelled' && <span className="px-2.5 py-1 rounded-md text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/20">Цуцлагдсан</span>}
@@ -471,6 +489,7 @@ export default function AdminOrdersPage() {
                                                 <option value="pending">Хүлээгдэж байна</option>
                                                 <option value="confirmed">Баталгаажсан</option>
                                                 <option value="delivered">Хүргэгдсэн</option>
+                                                <option value="cancelled">Цуцлагдсан</option>
                                             </select>
                                         </div>
                                         <div>

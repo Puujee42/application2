@@ -205,19 +205,21 @@ export default function MobileFeaturedCarousel({ products }: MobileFeaturedCarou
                                         draggable={false}
                                     />
 
-                                    <ProductBadge
-                                        isFeatured={product.featured || product.sections?.includes('Онцгой') || product.sections?.includes('Онцлох')}
-                                        className="absolute z-10 top-3 right-3 scale-90"
-                                    />
+                                    <div className="absolute top-3 left-3 z-10 flex flex-col gap-1.5 items-start">
+                                        <ProductBadge
+                                            isFeatured={product.featured || product.sections?.includes('Онцгой') || product.sections?.includes('Онцлох')}
+                                            className="scale-90 origin-top-left shadow-sm"
+                                        />
 
-                                    {/* Stock Badge - Left */}
-                                    <div className={`absolute top-3 left-3 px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest backdrop-blur-md shadow-md border ${product.stockStatus === 'pre-order'
-                                        ? 'bg-amber-500/90 text-white border-amber-400/50 shadow-amber-500/10'
-                                        : 'bg-emerald-500/90 text-white border-emerald-400/50 shadow-emerald-500/10'
-                                        }`}>
-                                        <div className="flex items-center gap-1">
-                                            <div className={`w-1 h-1 rounded-full bg-white ${product.stockStatus === 'in-stock' ? 'animate-pulse' : ''}`} />
-                                            {product.stockStatus === 'pre-order' ? 'Захиалга' : 'Бэлэн'}
+                                        {/* Stock Badge */}
+                                        <div className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest backdrop-blur-md shadow-md border ${product.stockStatus === 'pre-order'
+                                            ? 'bg-amber-500/90 text-white border-amber-400/50 shadow-amber-500/10'
+                                            : 'bg-emerald-500/90 text-white border-emerald-400/50 shadow-emerald-500/10'
+                                            }`}>
+                                            <div className="flex items-center gap-1">
+                                                <div className={`w-1 h-1 rounded-full bg-white ${product.stockStatus === 'in-stock' ? 'animate-pulse' : ''}`} />
+                                                {product.stockStatus === 'pre-order' ? 'Захиалга' : 'Бэлэн'}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -458,7 +458,7 @@ export default function CheckoutPage() {
                           className="w-full px-4 py-3 rounded-xl bg-gray-50 border-gray-200 focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium appearance-none text-base"
                         >
                           <option value="Улаанбаатар">Улаанбаатар</option>
-                          <option value="Орон нутаг">Орон нутаг</option>
+                          <option value="Орон нутаг">Орон Нутаг</option>
                         </select>
                       </div>
                       <div className="space-y-1.5">

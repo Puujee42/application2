@@ -154,6 +154,25 @@ function SearchContent() {
             </div>
           </div>
 
+          <form 
+            onSubmit={(e) => { 
+              e.preventDefault(); 
+              const val = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value.trim(); 
+              if (val) router.push(`/search?q=${encodeURIComponent(val)}`); 
+            }} 
+            className="relative mb-5" 
+          > 
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" /> 
+            <input 
+              name="q" 
+              type="search" 
+              autoFocus 
+              defaultValue={q} 
+              placeholder="Бараа хайх..." 
+              className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 transition-all" 
+            /> 
+          </form> 
+
           {/* Trending Horizontal Scroll */}
           <motion.div
             variants={containerVariants}
@@ -315,6 +334,24 @@ function SearchContent() {
   return (
     <div className="min-h-screen bg-[#F8F9FA] pt-4 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <form 
+          onSubmit={(e) => { 
+            e.preventDefault(); 
+            const val = (e.currentTarget.elements.namedItem('q') as HTMLInputElement).value.trim(); 
+            if (val) router.push(`/search?q=${encodeURIComponent(val)}`); 
+          }} 
+          className="relative mb-6 lg:hidden" 
+        > 
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" /> 
+          <input 
+            name="q" 
+            type="search" 
+            defaultValue={q} 
+            placeholder="Бараа хайх..." 
+            className="w-full pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-medium outline-none focus:border-[#FF5000] focus:ring-2 focus:ring-[#FF5000]/10 transition-all shadow-sm" 
+          /> 
+        </form>
+
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
