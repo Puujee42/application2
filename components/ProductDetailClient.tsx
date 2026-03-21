@@ -29,7 +29,6 @@ export type ProductDetailData = {
   category: string;
   stockStatus: string;
   inventory?: number;
-  salesCount?: number;
   shippingOrigin?: string;
   shippingDestination?: string;
   dispatchTime?: string;
@@ -40,7 +39,6 @@ export type ProductDetailData = {
   paymentMethods?: string;
   createdAt?: string;
   updatedAt?: string;
-  wholesale?: boolean;
   sections?: string[];
   featured?: boolean;
   relatedProducts?: Product[];
@@ -311,14 +309,13 @@ function useFloatingOrb(lerpAmt = 0.035) {
 export default function ProductDetailClient({ product, initialReviews }: { product: ProductDetailData, initialReviews: any[] }) {
   const router = useRouter();
   const { user, isAuthenticated } = useAuth();
-  
+
   const { data: categoriesData } = useSWR('/api/categories', (url) => fetch(url).then(r => r.json()));
   const categories = categoriesData?.categories || [];
 
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
-  const [deliveryEstimate, setDeliveryEstimate] = useState<string | null>(null);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
   const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>({});
@@ -340,7 +337,7 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
 
   const selectedVariant = useMemo(() => {
     if (!product.variants?.length) return null;
-    return product.variants.find((v: any) => 
+    return product.variants.find((v: any) =>
       product.options?.every((opt: any) => v.options[opt.name] === selectedOptions[opt.name])
     ) || null;
   }, [selectedOptions, product.variants, product.options]);
@@ -349,10 +346,10 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
   const displayInventory = selectedVariant ? selectedVariant.inventory : (product.inventory ?? 0);
   const isOutOfStock = product.options?.length ? (!selectedVariant || displayInventory <= 0) : (displayInventory <= 0);
 
-  const canAddToCart = !product.options?.length || (
+  const canAddToCart = !isOutOfStock && (!product.options?.length || (
     product.options.every((o: any) => selectedOptions[o.name]) &&
     selectedVariant && selectedVariant.inventory > 0
-  );
+  ));
 
   const { addItem, toggleAllSelection } = useCartStore();
   const { t } = useTranslation();
@@ -364,17 +361,6 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
     return () => unsub();
   }, [scrollY]);
 
-  useEffect(() => {
-    if (product.stockStatus !== 'pre-order') return;
-    fetch('/api/delivery', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productName: product.name, stockStatus: product.stockStatus })
-    })
-      .then(r => r.json())
-      .then(data => setDeliveryEstimate(data.estimation || null))
-      .catch(() => null);
-  }, [product.id, product.stockStatus]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -405,7 +391,7 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
 
   const categoryObj = categories.find((c: any) => c.id === product.category);
   const categoryName = categoryObj ? categoryObj.name : product.category;
-  
+
   let subcategoryName = null;
   if (product.subcategory && categoryObj?.subcategories) {
     const subObj = categoryObj.subcategories.find((s: any) => s.id === product.subcategory);
@@ -483,10 +469,10 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
     }
 
     toggleAllSelection(false);
-    await addItem({ 
-      ...product, 
-      image: product.image || '', 
-      stockStatus: product.stockStatus as any, 
+    await addItem({
+      ...product,
+      image: product.image || '',
+      stockStatus: product.stockStatus as any,
       description: product.description || undefined,
       price: displayPrice,
       variantId: selectedVariant?.id,
@@ -551,7 +537,7 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
                   </div>
                   <div>
                     <p className="font-bold text-slate-900 text-sm leading-tight line-clamp-1 max-w-xs">{product.name}</p>
-                    <p className="font-sora font-bold text-[#FF500] text-sm leading-none mt-0.5">{formatPrice(product.price)}</p>
+                    <p className="font-sora font-bold text-[#FF500] text-sm leading-none mt-0.5">{formatPrice(displayPrice * quantity)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -709,7 +695,6 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
               {/* Trust grid */}
               <div className="hidden md:grid grid-cols-3 gap-3 mt-2">
                 {[
-                  { icon: Truck, color: 'blue', bg: 'bg-blue-50', text: 'text-blue-500', label: 'Шуурхай хүргэлт', sub: deliveryEstimate || product.delivery || 'Хот дотор үнэгүй' },
                   { icon: ShieldCheck, color: 'emerald', bg: 'bg-emerald-50', text: 'text-emerald-500', label: 'Баталгаат хугацаа', sub: '100% Оригинал' },
                   { icon: RotateCcw, color: 'purple', bg: 'bg-purple-50', text: 'text-purple-500', label: 'Буцаалт хэвийн', sub: '7 хоногт буцаах' },
                 ].map(({ icon: Icon, bg, text, label, sub }) => (
@@ -748,45 +733,49 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <span className="text-gray-500 text-sm min-w-[60px]">Үнэ</span>
-                      {product.originalPrice && (
+                      {product.originalPrice && product.originalPrice > displayPrice ? (
                         <span className="text-gray-400 text-sm line-through">
                           {formatPrice(product.originalPrice)}
                         </span>
+                      ) : (
+                        <span className="text-[28px] md:text-[34px] font-bold text-[#FF500] leading-none tracking-tight font-sora">
+                          {formatPrice(displayPrice * quantity)}
+                        </span>
                       )}
                     </div>
-                    <span className="text-gray-500 text-xs text-right">3 борлуулагдсан</span>
                   </div>
 
                   {/* Row 2: Promo Price */}
                   <div className="flex items-end gap-4 mt-1">
                     <span className="text-gray-500 text-sm min-w-[60px] pb-1.5">Хямдрал</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[28px] md:text-[34px] font-bold text-[#FF500] leading-none tracking-tight font-sora">
-                        {formatPrice(displayPrice)}
-                      </span>
-                      <span className="bg-[#FF500] text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold tracking-wider">
-                        {product.stockStatus === 'pre-order' ? 'ЗАХИАЛГААР' : 'БЭЛЭН'}
-                      </span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[28px] md:text-[34px] font-bold text-[#FF500] leading-none tracking-tight font-sora">
+                          {formatPrice(displayPrice * quantity)}
+                        </span>
+                        <span className="bg-[#FF500] text-white text-[10px] px-1.5 py-0.5 rounded-sm font-bold tracking-wider">
+                          {product.stockStatus === 'pre-order' ? 'ЗАХИАЛГААР' : 'БЭЛЭН'}
+                        </span>
+                      </div>
+                      {quantity > 1 && (
+                        <span className="text-xs text-gray-400 font-medium mt-1">
+                          Нэгж үнэ: {formatPrice(displayPrice)}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* 3. Details Matrix Grid */}
                 <div className="flex flex-col gap-4 text-sm mb-6 border-b border-gray-100 pb-6">
-                  {/* Shipping */}
+                  {/* Delivery */}
                   <div className="flex items-start">
                     <span className="text-gray-500 min-w-[70px] mt-0.5">Хүргэлт</span>
-                    <div className="flex flex-col gap-1.5 text-gray-900">
-                      <div className="flex items-center gap-2">
-                        <span>{product.shippingOrigin || 'БНХАУ'}</span>
-                        <ChevronRight className="w-3 h-3 text-gray-400" />
-                        <span>{product.shippingDestination || 'Улаанбаатар'}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium">{product.delivery || 'Үнэгүй'}</span>
-                        <span className="text-gray-400">|</span>
-                        <span className="text-gray-600">{product.dispatchTime || '48 цагийн дотор илгээнэ'}</span>
-                      </div>
+                    <div className="flex flex-col gap-1 text-gray-900">
+                      <span className="font-medium">
+                        {product.stockStatus === 'in-stock' ? '1 хоногт хүргэнэ' : '7 хоногт хүргэнэ'}
+                      </span>
+                      <span className="text-xs text-gray-400">Монгол даяар хүргэнэ</span>
                     </div>
                   </div>
 
@@ -799,7 +788,7 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
                           <div className="flex flex-wrap gap-2">
                             {option.values.map((val: any) => {
                               const isSelected = selectedOptions[option.name] === val;
-                              
+
                               // Find an image from variants that matches this specific option value
                               let valImage = '';
                               if (product.variants) {
@@ -814,11 +803,10 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
                                 <button
                                   key={val}
                                   onClick={() => setSelectedOptions(p => ({ ...p, [option.name]: val }))}
-                                  className={`transition-all border ${
-                                    isSelected 
-                                      ? 'border-[#FF5000] border-2 px-3 py-1 bg-white text-gray-900' 
-                                      : 'border-gray-300 bg-white text-gray-900 px-3 py-1 hover:border-[#FF5000]'
-                                  } ${hasImage ? 'rounded-sm flex items-center gap-2 h-9' : 'rounded-sm h-8'}`}
+                                  className={`transition-all border ${isSelected
+                                    ? 'border-[#FF5000] border-2 px-3 py-1 bg-white text-gray-900'
+                                    : 'border-gray-300 bg-white text-gray-900 px-3 py-1 hover:border-[#FF5000]'
+                                    } ${hasImage ? 'rounded-sm flex items-center gap-2 h-9' : 'rounded-sm h-8'}`}
                                 >
                                   {hasImage && (
                                     <div className="w-5 h-5 bg-gray-100 rounded-sm overflow-hidden shrink-0">
@@ -840,28 +828,37 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
                     ))
                   )}
 
-                  {/* Quantity */}
                   <div className="flex items-center mt-4">
                     <span className="text-gray-500 min-w-[70px]">Тоо</span>
                     <div className="flex items-center">
-                      <div className="flex border border-gray-300 rounded-sm overflow-hidden h-8">
-                        <button 
+                      <div className="flex border border-gray-300 rounded-sm overflow-hidden h-10">
+                        <button
                           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                          className="w-8 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                          className="w-10 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                          aria-label="Decrease quantity"
                         >
-                          <Minus className="w-3 h-3" strokeWidth={2.5} />
+                          <Minus className="w-4 h-4" strokeWidth={2.5} />
                         </button>
-                        <div className="w-12 flex items-center justify-center border-l border-r border-gray-300 text-sm font-medium text-gray-900">
-                          {quantity}
-                        </div>
-                        <button 
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            if (!isNaN(val)) {
+                              setQuantity(Math.max(1, Math.min(displayInventory, val)));
+                            }
+                          }}
+                          className="w-14 text-center border-l border-r border-gray-300 text-sm font-bold text-gray-900 bg-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        />
+                        <button
                           onClick={() => setQuantity(Math.min(displayInventory, quantity + 1))}
-                          className="w-8 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors"
+                          className="w-10 flex items-center justify-center bg-gray-50 text-gray-600 hover:bg-gray-100 active:bg-gray-200 transition-colors"
+                          aria-label="Increase quantity"
                         >
-                          <Plus className="w-3 h-3" strokeWidth={2.5} />
+                          <Plus className="w-4 h-4" strokeWidth={2.5} />
                         </button>
                       </div>
-                      <span className="text-gray-400 ml-3 text-xs">
+                      <span className="text-gray-400 ml-4 text-xs">
                         {displayInventory} Ширхэг бэлэн
                       </span>
                     </div>
@@ -983,11 +980,11 @@ export default function ProductDetailClient({ product, initialReviews }: { produ
               Нийт үнэ
             </span>
             <span className="font-sora font-extrabold text-[18px] text-[#FF500] leading-none truncate">
-              {formatPrice(product.price * quantity)}
+              {formatPrice(displayPrice * quantity)}
             </span>
             {quantity > 1 && (
               <span className="text-[10px] text-slate-400 font-bold mt-0.5">
-                {quantity}ш × {formatPrice(product.price)}
+                {quantity}ш × {formatPrice(displayPrice)}
               </span>
             )}
           </div>

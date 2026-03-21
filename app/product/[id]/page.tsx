@@ -64,7 +64,6 @@ export default async function ProductDetailPage({
       rating: p.rating || 0,
       category: p.category,
       featured: p.featured,
-      wholesale: p.wholesale,
       stockStatus: p.stockStatus,
       inventory: p.inventory
     }));
@@ -83,13 +82,11 @@ export default async function ProductDetailPage({
       inventory: product.inventory ?? 0,
       brand: product.brand || undefined,
       model: product.model || undefined,
-      delivery: product.delivery || undefined,
       paymentMethods: product.paymentMethods || undefined,
       sections: product.sections || [],
       attributes: product.attributes || {},
       options: product.options || [],
       variants: product.variants || [],
-      salesCount: product.salesCount || 0,
       shippingOrigin: product.shippingOrigin || undefined,
       shippingDestination: product.shippingDestination || undefined,
       dispatchTime: product.dispatchTime || undefined,

@@ -122,9 +122,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             </p>
                           )}
 
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="font-sora font-bold text-[#FF5000]">{item.price?.toLocaleString()}₮</span>
-                            <span className="text-slate-500 text-sm">{item.quantity} шт.</span>
+                          <div className="flex flex-col mt-1">
+                            <span className="font-sora font-bold text-[#FF5000] text-sm">
+                              {formatPrice(item.price * item.quantity)}
+                            </span>
+                            {item.quantity > 1 && (
+                              <span className="text-[10px] text-slate-400 font-medium">
+                                {formatPrice(item.price)} / ш
+                              </span>
+                            )}
                           </div>
                         </div>
                         <div className="flex items-center justify-between mt-2">

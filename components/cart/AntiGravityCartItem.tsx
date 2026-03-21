@@ -142,10 +142,15 @@ export default function AntiGravityCartItem({ item }: AntiGravityCartItemProps) 
                                 {item.category}
                             </span>
                         </div>
-                        <div className="text-right shrink-0">
+                        <div className="text-right shrink-0 flex flex-col items-end">
                             <p className="text-[16px] font-bold text-gray-900 tracking-tight leading-none">
-                                {formatPrice(item.price)}
+                                {formatPrice(item.price * item.quantity)}
                             </p>
+                            {item.quantity > 1 && (
+                                <p className="text-[10px] text-gray-400 mt-1 font-medium">
+                                    {formatPrice(item.price)} / ш
+                                </p>
+                            )}
                         </div>
                     </div>
 
