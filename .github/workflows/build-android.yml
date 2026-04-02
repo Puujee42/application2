@@ -30,6 +30,8 @@ jobs:
       # 3. BUILD YOUR ACTUAL WEB CODE! 
       # (If your project uses Next.js, React, Vite, etc., it generates the 'out' or 'dist' folder)
       - name: Build Web App
+        env:
+          JWT_SECRET: "a7bf69e0bb70ca4aeab470c5f8902d01fb8369927942d3b4a8d0fc9f37e51248"
         run: npm run build
 
       - name: Sync Capacitor
