@@ -11,13 +11,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Node 20 is safer than 22 for native npm dependencies
+      # 1. Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      # 2. CHANGED TO JAVA 17: Crucial for Gradle/Android compatibility
+      # 2. Setup Java 17 for Android compatibility
       - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
@@ -27,22 +27,52 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 3. BUILD YOUR ACTUAL WEB CODE! 
-      # (If your project uses Next.js, React, Vite, etc., it generates the 'out' or 'dist' folder)
+      # 3. Create .env file securely using GitHub Secrets!
+      - name: Create secure .env file
+        run: |
+          cat <<EOF > .env
+          MONGODB_URI=${{ secrets.MONGODB_URI }}
+          MONGO_DB=${{ secrets.MONGO_DB }}
+          NEXT_PUBLIC_LIVEKIT_URL=${{ secrets.NEXT_PUBLIC_LIVEKIT_URL }}
+          LIVEKIT_API_KEY=${{ secrets.LIVEKIT_API_KEY }}
+          LIVEKIT_API_SECRET=${{ secrets.LIVEKIT_API_SECRET }}
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+          NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=${{ secrets.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          GMAIL_USER=${{ secrets.GMAIL_USER }}
+          GMAIL_PASS=${{ secrets.GMAIL_PASS }}
+          ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
+          NEXT_PUBLIC_BUILDER_API_KEY=${{ secrets.NEXT_PUBLIC_BUILDER_API_KEY }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          Deepseek_API=${{ secrets.Deepseek_API }}
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
+          CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+          FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY=${{ secrets.FIREBASE_PRIVATE_KEY }}
+          EOF
+
+      # 4. Build Web App (Now it has the .env file it needs!)
       - name: Build Web App
-        env:
-          JWT_SECRET: "a7bf69e0bb70ca4aeab470c5f8902d01fb8369927942d3b4a8d0fc9f37e51248"
         run: npm run build
 
+      # 5. Sync Capacitor
       - name: Sync Capacitor
         run: npx cap sync android --verbose
 
+      # 6. Build the APK
       - name: Build APK
         run: |
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
 
+      # 7. Upload the APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
