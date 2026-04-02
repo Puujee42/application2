@@ -11,25 +11,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 1. Node 20 is safer than 22 for native npm dependencies
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: '20'
 
-      - name: Setup Java 21
+      # 2. CHANGED TO JAVA 17: Crucial for Gradle/Android compatibility
+      - name: Setup Java 17
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Install dependencies
         run: npm install
 
+      # 3. BUILD YOUR ACTUAL WEB CODE! 
+      # (If your project uses Next.js, React, Vite, etc., it generates the 'out' or 'dist' folder)
+      - name: Build Web App
+        run: npm run build
+
       - name: Sync Capacitor
-        run: |
-          mkdir -p out
-          touch out/index.html
-          npx cap sync android --verbose
+        run: npx cap sync android --verbose
 
       - name: Build APK
         run: |
